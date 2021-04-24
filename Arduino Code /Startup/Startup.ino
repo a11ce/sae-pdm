@@ -1,29 +1,65 @@
-const int RAD_FAN_OUT  = 41;
-const int COOLANT_PUMP_OUT = 43;
-const int BRAKELIGHT_OUT = 39;
-const int BRAKE_PRESSURE_OUT = 37;
+#define TEST_MODE
 
-const int SPEED_SENSE_OUT = 33;
-const int TEMP_SENSE_OUT = 35;
-const int POT_SENSE_OUT = 31;
+#ifdef TEST_MODE
+  // TESTING LED VALUES - COMMENT OUT IN REAL USE
+  // CUT 1
+  const int SPEED_SENSE_OUT = 14;
+  const int TEMP_SENSE_OUT = 15;
+  const int POT_SENSE_OUT = 16;
+  const int BRAKE_PRESSURE_OUT = 17;
+  // CUT 2
+  const int RAD_FAN_OUT  = 18;
+  const int BRAKELIGHT_OUT = 19;
+  // FINAL CUT
+  const int COOLANT_PUMP_OUT = 20;
+#else
+  // REAL PORTS
+  // CUT 1
+  const int SPEED_SENSE_OUT = 33;
+  const int TEMP_SENSE_OUT = 35;
+  const int POT_SENSE_OUT = 31;
+  const int BRAKE_PRESSURE_OUT = 37;
+  // CUT 2
+  const int RAD_FAN_OUT  = 41;
+  const int BRAKELIGHT_OUT = 39;
+  // FINAL CUT
+  const int COOLANT_PUMP_OUT = 43;
+#endif
+
+
+
+
 
 #define BATTERY_IN A6
 #define VOLT_MULT 4;
 
+
+
+
+#define CUT1_MIN 11
+int cut1Outs[] = {SPEED_SENSE_OUT, TEMP_SENSE_OUT,
+                    POT_SENSE_OUT, BRAKE_PRESSURE_OUT};
+int cut1Outs_INV[] = {RAD_FAN_OUT, COOLANT_PUMP_OUT, 
+                      BRAKELIGHT_OUT};
+
+#define CUT2_MIN 10.5
+int cut2Outs[] = {RAD_FAN_OUT, BRAKELIGHT_OUT};
+int cut2Outs_INV[] = {COOLANT_PUMP_OUT};
+
+#define ALLOUTS_MIN 10
 int allOuts[] = {RAD_FAN_OUT, COOLANT_PUMP_OUT, 
                  BRAKELIGHT_OUT,SPEED_SENSE_OUT,
                  TEMP_SENSE_OUT, POT_SENSE_OUT,
                  BRAKE_PRESSURE_OUT};
 
-int sensorOuts[] = {SPEED_SENSE_OUT, TEMP_SENSE_OUT,
-                    POT_SENSE_OUT};
-                    
 #define ALLOUTS_LEN sizeof(allOuts) / sizeof(int)
-#define SENSOROUTS_LEN sizeof(sensorOuts) / sizeof(int)
+#define CUT1OUTS_LEN sizeof(cut1Outs) / sizeof(int)
+#define CUT2OUTS_LEN sizeof(cut1Outs) / sizeof(int)
 
-#define SENSOR_MINIMAL 11
+#define CUT1OUTS_INV_LEN sizeof(cut1Outs_INV) / sizeof(int)
+#define CUT2OUTS_INV_LEN sizeof(cut1Outs_INV) / sizeof(int)
 
-#define ALLOUTS_MINIMAL 10
+
 
 
 
@@ -41,23 +77,15 @@ void setup() {
   {
     pinMode(allOuts[i], OUTPUT);
   }
+}
+
+void writeArrOuts(int val, int arr[], int len)
+{
+  for (int i = 0; i < len; i++)
+  {
+    digitalWrite(arr[i], val);
+  }
   
-}
-
-void writeAllOuts(int val)
-{
-  for (int i = 0; i < ALLOUTS_LEN; i++)
-  {
-    digitalWrite(allOuts[i], val);
-  }
-}
-
-void writeSensorOuts(int val)
-{
-  for (int i = 0; i < SENSOROUTS_LEN; i++)
-  {
-    digitalWrite(sensorOuts[i], val);
-  }
 }
 
 
@@ -65,17 +93,25 @@ void loop() {
 
   float battery = batteryVoltage();
    
-  if(battery < ALLOUTS_MINIMAL)
+  if(battery < ALLOUTS_MIN)
   {
-    writeAllOuts(LOW);
+    writeArrOuts(LOW, allOuts, ALLOUTS_LEN);
   }
-  else if (battery < SENSOR_MINIMAL)
+  else if (battery < CUT2_MIN)
   {
-    writeSensorOuts(LOW);
-  } 
+    // cut everything
+    writeArrOuts(LOW, allOuts, ALLOUTS_LEN);
+    // except coolant pump
+    digitalWrite(COOLANT_PUMP_OUT, HIGH);
+  }
+  else if (battery < CUT1_MIN)
+  {
+    writeArrOuts(LOW, cut1Outs, CUT1OUTS_LEN);
+    writeArrOuts(HIGH, cut1Outs_INV, CUT1OUTS_INV_LEN);
+  }
   else
   {
-    writeAllOuts(HIGH);
+    writeArrOuts(HIGH, allOuts, ALLOUTS_LEN);
   }
 
 }
