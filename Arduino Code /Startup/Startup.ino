@@ -42,10 +42,11 @@
 
 int allOuts[] = {COOLANT_PUMP_OUT, 
 
-                RAD_FAN_OUT, BRAKELIGHT_OUT,
+                BRAKELIGHT_OUT, RAD_FAN_OUT,
 
-                SPEED_SENSE_OUT, TEMP_SENSE_OUT,
-                POT_SENSE_OUT, BRAKE_PRESSURE_OUT};
+                BRAKE_PRESSURE_OUT, POT_SENSE_OUT,
+                TEMP_SENSE_OUT, SPEED_SENSE_OUT};
+                
 
 
 #define ALLOUTS_LEN sizeof(allOuts) / sizeof(int)
@@ -60,9 +61,10 @@ float batteryVoltage() {
 
 void setCutoff(int cutoffIdx)
 {
-  for (int i = 0; i < ALLOUTS_LEN; i++)
+  for (int i = 0; i < 7; i++)
   {
-    digitalWrite(allOuts[i], i > cutoffIdx ? HIGH : LOW);
+      digitalWrite(allOuts[i], (i < cutoffIdx) ? HIGH : LOW);
+ 
   }
   
 }
@@ -73,14 +75,14 @@ void setup() {
   {
     pinMode(allOuts[i], OUTPUT);
   }
-  setCutoff(-1);
+  setCutoff(ALLOUTS_LEN);
 }
 
 
 void loop() {
 
   float battery = batteryVoltage();
-   
+   //setCutoff(1);
   if(battery < CUT3_MIN)
   {
     setCutoff(CUT3_IDX);
@@ -89,13 +91,12 @@ void loop() {
   {
     setCutoff(CUT2_IDX);
   }
-    else if (battery < CUT1_MIN)
+  else if (battery < CUT1_MIN)
   {
     setCutoff(CUT1_IDX);
   }
   else
   {
-    setCutoff(-1);
+    setCutoff(ALLOUTS_LEN);
   }
-
 }
