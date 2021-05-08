@@ -27,18 +27,20 @@
 #endif
 
 #define BATTERY_IN A6
-#define VOLT_MULT 4;
+#define VOLT_MULT 4
+#define HYSTER 0
 
-#define CUT1_MIN 11
-#define CUT2_MIN 10.5
-#define CUT3_MIN 10
+#define NUM_CUTS 3
 
+const float cutVoltages[NUM_CUTS] = {10.0, 10.5, 11.0};
 // everything at or below the given index will be cut
 // if the voltage drops below the threshold;
 // read it as 'the first N in the array will stay on'
-#define CUT1_IDX 3 // no sensors
-#define CUT2_IDX 1 // just the coolant pump
-#define CUT3_IDX 0 // everything off
+// 3 no sensors
+// 1 just the coolant pump
+// 0 everything off
+const int cutIndexes[NUM_CUTS] = {0, 1, 3};
+
 
 int allOuts[] = {COOLANT_PUMP_OUT, 
 
@@ -59,9 +61,10 @@ float batteryVoltage() {
   return voltage;
 }
 
+
 void setCutoff(int cutoffIdx)
 {
-  for (int i = 0; i < 7; i++)
+  for (int i = 0; i < ALLOUTS_LEN; i++)
   {
       digitalWrite(allOuts[i], (i < cutoffIdx) ? HIGH : LOW);
  
@@ -75,28 +78,49 @@ void setup() {
   {
     pinMode(allOuts[i], OUTPUT);
   }
+  pinMode(45, OUTPUT);
+  pinMode(47, OUTPUT);
   setCutoff(ALLOUTS_LEN);
 }
 
 
 void loop() {
 
-  float battery = batteryVoltage();
-   //setCutoff(1);
-  if(battery < CUT3_MIN)
+  float currentVoltage = batteryVoltage();
+
+/*
+  boolean canSaysCarFucked = false;
+  if(canSaysCarFucked)
   {
-    setCutoff(CUT3_IDX);
+    while(true)
+    {
+        // kill everything until reset
+        // 31-47
+        for(int idx = 31; idx < 49; idx += 2)
+        {
+            digitalWrite(idx, LOW);
+        }
+    }
   }
-  else if (battery < CUT2_MIN)
+   */
+  int currentCuts = false;
+  for(int idx = 0; idx < NUM_CUTS; idx++)
   {
-    setCutoff(CUT2_IDX);
+
+    if(currentVoltage < (cutVoltages[idx] + HYSTER))
+    {
+      currentCuts = true;
+      if (currentVoltage < (cutVoltages[idx] - HYSTER))
+      {
+        setCutoff(cutIndexes[idx]);
+      }
+
+    }
   }
-  else if (battery < CUT1_MIN)
+  
+  if(!currentCuts)
   {
-    setCutoff(CUT1_IDX);
-  }
-  else
-  {
-    setCutoff(ALLOUTS_LEN);
+     setCutoff(ALLOUTS_LEN);
+
   }
 }

@@ -1,4 +1,4 @@
-#define TEST_MODE
+//#define TEST_MODE
 
 #ifdef TEST_MODE
   // TESTING LED VALUES 
@@ -28,11 +28,11 @@
 
 #define BATTERY_IN A6
 #define VOLT_MULT 4
-#define HYSTER 0.2
+const float HYSTER = 0.2;
 
 #define NUM_CUTS 3
 
-const float cutVoltages[NUM_CUTS] = {10, 10.5, 11};
+const float cutVoltages[NUM_CUTS] = {10.0, 10.5, 11.0};
 // everything at or below the given index will be cut
 // if the voltage drops below the threshold;
 // read it as 'the first N in the array will stay on'
@@ -69,7 +69,6 @@ void setCutoff(int cutoffIdx)
       digitalWrite(allOuts[i], (i < cutoffIdx) ? HIGH : LOW);
  
   }
-  
 }
 
 void setup() {
@@ -78,28 +77,54 @@ void setup() {
   {
     pinMode(allOuts[i], OUTPUT);
   }
+  pinMode(45, OUTPUT);
+  pinMode(47, OUTPUT);
   setCutoff(ALLOUTS_LEN);
+  //Serial.begin(9600);
 }
 
 
 void loop() {
 
   float currentVoltage = batteryVoltage();
-
-   
+  //currentVoltage = 10.2;
+  //currentVoltage = 0;
+/*
+  boolean canSaysCarFucked = false;
+  if(canSaysCarFucked)
+  {
+    while(true)
+    {
+        // kill everything until reset
+        // 31-47
+        for(int idx = 31; idx < 49; idx += 2)
+        {
+            digitalWrite(idx, LOW);
+        }
+    }
+  }
+   */
   int currentCuts = false;
+  
   for(int idx = 0; idx < NUM_CUTS; idx++)
   {
+/*
+    if(currentVoltage < cutVoltages[idx])
+    {
+        setCutoff(cutIndexes[idx]);
+        break;
+    }*/
 
     if(currentVoltage < (cutVoltages[idx] + HYSTER))
     {
       currentCuts = true;
       if (currentVoltage < (cutVoltages[idx] - HYSTER))
       {
-              setCutoff(cutIndexes[idx]);
+        setCutoff(cutIndexes[idx]);
+        break;
       }
 
-    }
+    } 
   }
   
   if(!currentCuts)
@@ -107,4 +132,5 @@ void loop() {
      setCutoff(ALLOUTS_LEN);
 
   }
+  //setCutoff(0);
 }
