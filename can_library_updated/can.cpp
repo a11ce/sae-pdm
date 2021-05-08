@@ -13,7 +13,7 @@ int can_setup(){
   return !mcp2515_init(0);
 }
 
-unsigned int _combined_data(int data[], size_t firstIndex)
+unsigned int _combined_data(uint8_t data[], unsigned int firstIndex)
 {
     return (data[firstIndex] << 8) + data[firstIndex + 1];
 }
@@ -33,13 +33,13 @@ unsigned int can_read(unsigned int addr) {
             // brake temp front left
             switch(addr)
             {
-                case 2:  // brake temp front left
+                case ADDR_BRAKE_TEMP_FRONT_LEFT:  // brake temp front left
                     return _combined_data(r_message.data, 0);
-                case 3:  // brake temp front right
+                case ADDR_BRAKE_TEMP_FRONT_RIGHT:  // brake temp front right
                     return _combined_data(r_message.data, 2);
-                case 4: // brake temp rear left
+                case ADDR_BRAKE_TEMP_REAR_LEFT: // brake temp rear left
                     return _combined_data(r_message.data, 4);
-                case 5: // brake temp rear right
+                case ADDR_BRAKE_TEMP_REAR_RIGHT: // brake temp rear right
                     return _combined_data(r_message.data, 6);
                     
             }
@@ -48,9 +48,9 @@ unsigned int can_read(unsigned int addr) {
             
             switch(addr)
             {
-                case 0: // brake pressure rear
+                case ADDR_BRAKE_PRESSURE_REAR: // brake pressure rear
                     return _combined_data(r_message.data, 2);
-                case 1: // brake pressure front
+                case ADDR_BRAKE_PRESSURE_FRONT: // brake pressure front
                     return _combined_data(r_message.data, 0);          
             }
 
@@ -58,13 +58,13 @@ unsigned int can_read(unsigned int addr) {
 
             switch(addr)
             {
-                case 10: // wheel speed front left
+                case ADDR_WHEEL_SPEED_FRONT_LEFT: // wheel speed front left
                     return _combined_data(r_message.data, 0);
-                case 11: // wheel speed front right
+                case ADDR_WHEEL_SPEED_FRONT_RIGHT: // wheel speed front right
                     return _combined_data(r_message.data, 2);
-                case 12: // wheel speed rear left
+                case ADDR_WHEEL_SPEED_REAR_LEFT: // wheel speed rear left
                     return _combined_data(r_message.data, 4);
-                case 13: // wheel speed rear right
+                case ADDR_WHEEL_SPEED_REAR_RIGHT: // wheel speed rear right
                     return _combined_data(r_message.data, 6);
             }
             
@@ -72,13 +72,13 @@ unsigned int can_read(unsigned int addr) {
             // engine speed
             switch(addr)
             {
-                case 50: // engine speed
+                case ADDR_ENGINE_SPEED: // engine speed
                     return _combined_data(r_message.data, 0);
-                case 51: // manifold air pressure
+                case ADDR_MANIFOLD_AIR_PRESSURE: // manifold air pressure
                     return _combined_data(r_message.data, 2);
-                case 52: // manifold air temp
+                case ADDR_MANIFOLD_AIR_TEMP: // manifold air temp
                     return _combined_data(r_message.data, 4);
-                case 31: // throttle position
+                case ADDR_THROTTLE_POSITION: // throttle position
                     return _combined_data(r_message.data, 6);
             }
             
@@ -87,36 +87,36 @@ unsigned int can_read(unsigned int addr) {
           case 0x649: 
             switch(addr)
             {
-                case 21: // engine oil temp
+                case ADDR_ENGINE_OIL_TEMP: // engine oil temp
                     return r_message.data[1];
-                case 53: // coolant temp
+                case ADDR_COOLANT_TEMP: // coolant temp
                     return r_message.data[0];
             }
 
           case 0x644:
             switch(addr)
             {
-                case 20: // oil pressure
+                case ADDR_OIL_PRESSURE: // oil pressure
                     return _combined_data(r_message.data, 6);
             }
     
           case 0x64E: 
             switch(addr)
             {
-                case 30: // neutral gear switch
+                case ADDR_NEUTRAL_GEAR_SWITCH: // neutral gear switch
                     return r_message.data[4] & 128; // deci number for 10000000
             }
             
           case 0x64D:
             switch(addr)
             {
-                case 32: // gear
+                case ADDR_GEAR: // gear
                     return r_message.data[4] & 0b00001111;
             }
           case 0x631:
             switch(addr)
             {
-                case 54: // car status bit  
+                case ADDR_CAR_STATUS_BIT: // car status bit  
                     return r_message.data[0]; 
             }
         }
