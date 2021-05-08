@@ -1,3 +1,5 @@
+#include <can.h>
+
 //#define TEST_MODE
 
 #ifdef TEST_MODE
@@ -87,10 +89,9 @@ void setup() {
 void loop() {
 
   float currentVoltage = batteryVoltage();
-  //currentVoltage = 10.2;
-  //currentVoltage = 0;
-/*
-  boolean canSaysCarFucked = false;
+  
+ 
+  boolean canSaysCarFucked = can_read(ADDR_CAR_STATUS_BIT);
   if(canSaysCarFucked)
   {
     while(true)
@@ -103,17 +104,11 @@ void loop() {
         }
     }
   }
-   */
+   
   int currentCuts = false;
   
   for(int idx = 0; idx < NUM_CUTS; idx++)
   {
-/*
-    if(currentVoltage < cutVoltages[idx])
-    {
-        setCutoff(cutIndexes[idx]);
-        break;
-    }*/
 
     if(currentVoltage < (cutVoltages[idx] + HYSTER))
     {
