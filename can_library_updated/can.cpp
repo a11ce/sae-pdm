@@ -113,6 +113,12 @@ unsigned int can_read(unsigned int addr) {
                 case 32: // gear
                     return r_message.data[4] & 0b00001111;
             }
+          case 0x631:
+            switch(addr)
+            {
+                case 54: // car status bit  
+                    return r_message.data[0]; 
+            }
         }
       }
     }
@@ -122,3 +128,4 @@ unsigned int can_read(unsigned int addr) {
     }
   }
 }
+
