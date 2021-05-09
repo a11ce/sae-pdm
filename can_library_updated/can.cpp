@@ -124,7 +124,7 @@ unsigned int can_read(unsigned int addr) {
     }
     else
     {
-      return NULL;
+      return 0;
     }
   }
 }
