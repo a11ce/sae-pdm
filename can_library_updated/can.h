@@ -30,7 +30,7 @@
 
 #define ADDR_THROTTLE_POSITION     31
 
-#define ADDR_GEAR 32;
+#define ADDR_GEAR 32
 
 #define ADDR_ENGINE_SPEED          50
 #define ADDR_MANIFOLD_AIR_PRESSURE 51
