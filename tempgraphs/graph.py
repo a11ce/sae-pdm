@@ -1,11 +1,25 @@
 import PySimpleGUI as sg
 import time
 
-RANGES = {"temp": (5, 45)}
-RANGES.update({"accel" + d: (-4, 4) for d in "xy"})
-RANGES.update({"accelz": (-12, -8)})
-RANGES.update({"mag" + d: (-100, 100) for d in "xyz"})
-RANGES.update({"gyro" + d: (-4, +4) for d in "xyz"})
+#RANGES = {"temp": (5, 45)}
+#RANGES.update({"accel" + d: (-4, 4) for d in "xy"})
+#RANGES.update({"accelz": (-12, -8)})
+#RANGES.update({"mag" + d: (-100, 100) for d in "xyz"})
+#RANGES.update({"gyro" + d: (-4, +4) for d in "xyz"})
+
+RANGES = {"Front left brake temp (C)": (5, 45)}
+RANGES.update({"Front right brake temp (C)": (5, 45)})
+RANGES.update({"accel" + d + " (m/s^2)": (-4, 4) for d in "xy"})
+RANGES.update({"accel z (m/s^2)": (-12, 2)})
+RANGES.update({"gyro (rad/s)" + d: (-4, +4) for d in "xyz"})
+
+#the next line defines which portions of the piped input string are considered FL brake temp, FR brake temp, etc
+SENSOR_IDXS = [4, 5, 24, 25, 26, 27, 28, 29]
+#as written, the 4th element is FL brake temp, the 5th is FR brake temp, the 24th is accel x, the 25th is accel y
+#the 26th is accel z, the 27th is gyro x, 28th gyro y and 29th gyro z
+#everything else in the string is discarded
+#this may need a little tweaking to match the output of main.py
+#the string is separated by spaces, so "1 2 3 4" becomes [1,2,3,4]
 
 ORDERED_KEYS = list(RANGES.keys())
 
@@ -24,13 +38,12 @@ def makeGraph(gKey, gRange):
 
 
 def makeWindow():
-    controlSection = [sg.Text("look its graphs")]
+    controlSection = [sg.Text("30 most recent data points from telemetry")]
 
-    layout = [[makeGraph(ORDERED_KEYS[0], RANGES[ORDERED_KEYS[0]])] +
-              controlSection,
-              [makeGraph(key, RANGES[key]) for key in ORDERED_KEYS[1:4]],
-              [makeGraph(key, RANGES[key]) for key in ORDERED_KEYS[4:7]],
-              [makeGraph(key, RANGES[key]) for key in ORDERED_KEYS[7:10]]]
+    layout = [[makeGraph(key, RANGES[key])
+               for key in ORDERED_KEYS[0:2]] + controlSection,
+              [makeGraph(key, RANGES[key]) for key in ORDERED_KEYS[2:5]],
+              [makeGraph(key, RANGES[key]) for key in ORDERED_KEYS[5:8]]]
 
     window = sg.Window("window title", layout, finalize=True)
     return window
@@ -70,10 +83,14 @@ def main():
         if event == sg.WIN_CLOSED or event == 'Exit':
             break
         inLine = input().strip().split(" ")
+        usedValuesCount = 0
         for valIdx, val in enumerate(inLine[1:]):
-            HISTDAT[ORDERED_KEYS[valIdx]].append(float(val))
-            HISTDAT[ORDERED_KEYS[valIdx]] = HISTDAT[
-                ORDERED_KEYS[valIdx]][-30::]
+            if valIdx in SENSOR_IDXS:
+                HISTDAT[ORDERED_KEYS[usedValuesCount]].append(float(val))
+                HISTDAT[ORDERED_KEYS[usedValuesCount]] = HISTDAT[
+                    ORDERED_KEYS[usedValuesCount]][-30::]
+                usedValuesCount += 1
+
         #print(inLine)
         updateGraphs(window)
 
