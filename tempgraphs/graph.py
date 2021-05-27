@@ -1,11 +1,19 @@
 import PySimpleGUI as sg
 import time
 
-RANGES = {"temp": (5, 45)}
-RANGES.update({"accel" + d: (-4, 4) for d in "xy"})
-RANGES.update({"accelz": (-12, -8)})
-RANGES.update({"mag" + d: (-100, 100) for d in "xyz"})
-RANGES.update({"gyro" + d: (-4, +4) for d in "xyz"})
+#RANGES = {"temp": (5, 45)}
+#RANGES.update({"accel" + d: (-4, 4) for d in "xy"})
+#RANGES.update({"accelz": (-12, -8)})
+#RANGES.update({"mag" + d: (-100, 100) for d in "xyz"})
+#RANGES.update({"gyro" + d: (-4, +4) for d in "xyz"})
+
+RANGES = {"Front left brake temp (C)": (5, 45)}
+RANGES.update({"Front right brake temp (C)": (5, 45)})
+RANGES.update({"accel" + d + " (m/s^2)": (-4, 4) for d in "xy"})
+RANGES.update({"accel z (m/s^2)": (-12, 2)})
+RANGES.update({"gyro (rad/s)" + d: (-4, +4) for d in "xyz"})
+
+usefulindexes = [4,5,24,25,26,27,28,29]
 
 ORDERED_KEYS = list(RANGES.keys())
 
@@ -24,13 +32,17 @@ def makeGraph(gKey, gRange):
 
 
 def makeWindow():
-    controlSection = [sg.Text("look its graphs")]
+    print(ORDERED_KEYS)
+    print(RANGES)
+    print(ORDERED_KEYS[0:2])
+    print(ORDERED_KEYS[2:5])
+    print(ORDERED_KEYS[5:8])
+    controlSection = [sg.Text("30 most recent data points from telemetry")]
 
-    layout = [[makeGraph(ORDERED_KEYS[0], RANGES[ORDERED_KEYS[0]])] +
+    layout = [[makeGraph(key, RANGES[key]) for key in ORDERED_KEYS[0:2]] +
               controlSection,
-              [makeGraph(key, RANGES[key]) for key in ORDERED_KEYS[1:4]],
-              [makeGraph(key, RANGES[key]) for key in ORDERED_KEYS[4:7]],
-              [makeGraph(key, RANGES[key]) for key in ORDERED_KEYS[7:10]]]
+              [makeGraph(key, RANGES[key]) for key in ORDERED_KEYS[2:5]],
+              [makeGraph(key, RANGES[key]) for key in ORDERED_KEYS[5:8]]]
 
     window = sg.Window("window title", layout, finalize=True)
     return window
@@ -61,6 +73,7 @@ def updateGraphs(window):
 
 def main():
     window = makeWindow()
+    print(window)
     initGraphs(window)
     fpsCount = 0
     start_time = time.time()
@@ -70,10 +83,14 @@ def main():
         if event == sg.WIN_CLOSED or event == 'Exit':
             break
         inLine = input().strip().split(" ")
+        valuesused = 0
         for valIdx, val in enumerate(inLine[1:]):
-            HISTDAT[ORDERED_KEYS[valIdx]].append(float(val))
-            HISTDAT[ORDERED_KEYS[valIdx]] = HISTDAT[
-                ORDERED_KEYS[valIdx]][-30::]
+            if valIdx in usefulindexes:
+                HISTDAT[ORDERED_KEYS[valuesused]].append(float(val))
+                HISTDAT[ORDERED_KEYS[valuesused]] = HISTDAT[
+                    ORDERED_KEYS[valuesused]][-30::]
+                valuesused += 1
+                    
         #print(inLine)
         updateGraphs(window)
 
