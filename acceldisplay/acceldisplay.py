@@ -15,6 +15,17 @@ axs[3].set_ylabel("mag (uT)")
 axs[6].set_ylabel("gyro (rad/s)")
 axs[9].set_ylabel("temp (c)")
 
+SHOW_SECS = 3
+SAMPLES = SHOW_SECS * 100
+
+lines = []
+for ax in axs:
+    line, = ax.plot([0, SAMPLES], [0, 10])
+    lines.append(line)
+
+plt.show()
+
+print(lines)
 for line in sys.stdin:
 
     idxDat.append(idx)
@@ -23,9 +34,10 @@ for line in sys.stdin:
     if line[0] == "10VALS":
         for valIdx, val in enumerate(line[1:]):
             histDat[valIdx].append(float(val))
-            axs[valIdx].plot(idxDat, histDat[valIdx])
-
+            #axs[valIdx].plot(idxDat, histDat[valIdx])
+            print(histDat[valIdx])
+            lines[valIdx].set_xdata(idxDat)
+            lines[valIdx].set_ydata(histDat[valIdx])
         idx += 1
-        plt.draw()
-        plt.show()
-        plt.pause(0.1)
+        fig.canvas.draw()
+        fig.canvas.flush_events()
