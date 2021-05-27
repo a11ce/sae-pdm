@@ -13,8 +13,14 @@ RANGES.update({"accel" + d + " (m/s^2)": (-4, 4) for d in "xy"})
 RANGES.update({"accel z (m/s^2)": (-12, 2)})
 RANGES.update({"gyro (rad/s)" + d: (-4, +4) for d in "xyz"})
 
+#the next line defines which portions of the piped input string are considered FL brake temp, FR brake temp, etc
 usefulindexes = [4,5,24,25,26,27,28,29]
-
+#as written, the 4th element is FL brake temp, the 5th is FR brake temp, the 24th is accel x, the 25th is accel y
+#the 26th is accel z, the 27th is gyro x, 28th gyro y and 29th gyro z
+#everything else in the string is discarded
+#this may need a little tweaking to match the output of main.py
+#the string is separated by spaces, so "1 2 3 4" becomes [1,2,3,4]
+ 
 ORDERED_KEYS = list(RANGES.keys())
 
 HISTDAT = {key: [] for key in ORDERED_KEYS}
