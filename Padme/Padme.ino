@@ -91,19 +91,19 @@ void loop() {
   float currentVoltage = batteryVoltage();
   
  
-  boolean canSaysCarFucked = can_read(ADDR_CAR_STATUS_BIT);
-  if(canSaysCarFucked)
-  {
-    while(true)
-    {
-        // kill everything until reset
+  // boolean canSaysCarFucked = can_read(ADDR_CAR_STATUS_BIT);
+  //if(canSaysCarFucked)
+  //{
+  //  while(true)
+   // {
+   //     // kill everything until reset
         // 31-47
-        for(int idx = 31; idx < 49; idx += 2)
-        {
-            digitalWrite(idx, LOW);
-        }
-    }
-  }
+    //    for(int idx = 31; idx < 49; idx += 2)
+      //  {
+      //      digitalWrite(idx, LOW);
+      //  }
+   // }
+  //}
    
   int currentCuts = false;
   
