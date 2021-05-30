@@ -80,7 +80,9 @@ void setup() {
     pinMode(allOuts[i], OUTPUT);
   }
   pinMode(45, OUTPUT);
+  digitalWrite(45, HIGH);
   pinMode(47, OUTPUT);
+  digitalWrite(47, HIGH);
   setCutoff(ALLOUTS_LEN);
   //Serial.begin(9600);
 }
