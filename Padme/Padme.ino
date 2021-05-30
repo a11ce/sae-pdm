@@ -1,4 +1,4 @@
-#include <can.h>
+//#include <can.h>
 
 //#define TEST_MODE
 
@@ -94,15 +94,15 @@ void loop() {
   // boolean canSaysCarFucked = can_read(ADDR_CAR_STATUS_BIT);
   //if(canSaysCarFucked)
   //{
-  //  while(true)
-   // {
-   //     // kill everything until reset
-        // 31-47
-    //    for(int idx = 31; idx < 49; idx += 2)
-      //  {
-      //      digitalWrite(idx, LOW);
-      //  }
-   // }
+  //   while(true)
+  //   {
+  //     // kill everything until reset
+  //     // 31-47
+  //     for(int idx = 31; idx < 49; idx += 2)
+  //     {
+  //       digitalWrite(idx, LOW);
+  //     }
+  //   }
   //}
    
   int currentCuts = false;
